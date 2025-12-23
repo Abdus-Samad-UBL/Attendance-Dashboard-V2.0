@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UBL Attendance Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ubl-navy: #054166;
+            --ubl-blue: #249ACC;
+            --ubl-light: #F8FAFB;
+            --ubl-silver: #E8ECEF;
+            --ubl-dark: #012A42;
+            --ubl-accent: #1B7CAB;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0A1628;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(36, 154, 204, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(5, 65, 102, 0.2) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(27, 124, 171, 0.1) 0%, transparent 70%);
+            z-index: 0;
+            animation: backgroundPulse 15s ease-in-out infinite;
+        }
+
+        @keyframes backgroundPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-50px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -1000px 0; }
+            100% { background-position: 1000px 0; }
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        .header-card {
+            background: linear-gradient(135deg, #012A42 0%, #054166 50%, #1B7CAB 100%);
+            border-radius: 32px;
+            padding: 3rem 2rem;
+            box-shadow: 
+                0 30px 90px rgba(0, 0, 0, 0.5),
+                0 10px 30px rgba(36, 154, 204, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+            animation: slideInDown 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+            margin-bottom: 2rem;
+        }
+
+        .header-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -50%;
+            width: 200%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.05),
+                transparent
+            );
+            animation: shimmer 4s infinite;
+        }
+
+        .header-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem;
+            font-weight: 900;
+            color: white;
+            text-align: center;
+            letter-spacing: 1px;
+            text-shadow: 
+                0 2px 10px rgba(0, 0, 0, 0.3),
+                0 0 30px rgba(36, 154, 204, 0.5);
+        }
+
+        .header-subtitle {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 0.875rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-top: 0.75rem;
+        }
+
+        .controls-card {
+            background: linear-gradient(135deg, #FFFFFF 0%, #F8FAFB 100%);
+            border-radius: 24px;
+            padding: 2rem;
+            box-shadow: 
+                0 20px 60px rgba(0, 0, 0, 0.3),
+                0 10px 30px rgba(0, 0, 0, 0.2);
+            margin-bottom: 2rem;
+            animation: fadeIn 0.6s ease-out 0.2s both;
+        }
+
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .control-group label {
+            display: block;
+            font-size: 0.8125rem;
+            font-weight: 700;
+            color: var(--ubl-navy);
+            margin-bottom: 0.625rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .control-select {
+            width: 100%;
+            padding: 0.875rem 1.25rem;
+            border: 2px solid #E5E7EB;
+            border-radius: 12px;
+            font-size: 0.9375rem;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s ease;
+            background: white;
+            color: var(--ubl-dark);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+
+        .control-select:focus {
+            outline: none;
+            border-color: var(--ubl-blue);
+            box-shadow: 0 0 0 3px rgba(36, 154, 204, 0.15);
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, var(--ubl-navy) 0%, var(--ubl-accent) 50%, var(--ubl-blue) 100%);
+            background-size: 200% 200%;
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 
+                0 6px 20px rgba(5, 65, 102, 0.35),
+                0 3px 10px rgba(5, 65, 102, 0.2);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 
+                0 10px 30px rgba(5, 65, 102, 0.45),
+                0 5px 15px rgba(36, 154, 204, 0.3);
+            background-position: 100% 0;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #FFFFFF 0%, #F8FAFB 100%);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 
+                0 10px 30px rgba(0, 0, 0, 0.15),
+                0 4px 12px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+            animation: fadeIn 0.6s ease-out both;
+            border: 2px solid rgba(36, 154, 204, 0.1);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, var(--ubl-blue), var(--ubl-navy));
+        }
+
+        .stat-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .stat-icon.present {
+            background: linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 100%);
+        }
+
+        .stat-icon.late {
+            background: linear-gradient(135deg, #FFF7ED 0%, #FFEDD5 100%);
+        }
+
+        .stat-icon.leave {
+            background: linear-gradient(135deg, #FEF2F2 0%, #FEE2E2 100%);
+        }
+
+        .stat-icon.total {
+            background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%);
+        }
+
+        .stat-label {
+            font-size: 0.8125rem;
+            font-weight: 600;
+            color: #64748B;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--ubl-navy);
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-subtitle {
+            font-size: 0.875rem;
+            color: #64748B;
+            font-weight: 500;
+        }
+
+        .table-card {
+            background: linear-gradient(135deg, #FFFFFF 0%, #F8FAFB 100%);
+            border-radius: 24px;
+            padding: 2rem;
+            box-shadow: 
+                0 20px 60px rgba(0, 0, 0, 0.3),
+                0 10px 30px rgba(0, 0, 0, 0.2);
+            animation: fadeIn 0.6s ease-out 0.4s both;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid rgba(36, 154, 204, 0.2);
+        }
+
+        .table-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--ubl-navy);
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        thead {
+            background: linear-gradient(135deg, var(--ubl-navy), var(--ubl-accent));
+            color: white;
+        }
+
+        thead th {
+            padding: 1rem;
+            text-align: left;
+            font-weight: 700;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        thead th:first-child {
+            border-radius: 12px 0 0 0;
+        }
+
+        thead th:last-child {
+            border-radius: 0 12px 0 0;
+        }
+
+        tbody tr {
+            transition: all 0.3s ease;
+            border-bottom: 1px solid #E5E7EB;
+        }
+
+        tbody tr:hover {
+            background: linear-gradient(90deg, rgba(36, 154, 204, 0.05) 0%, transparent 100%);
+            transform: translateX(4px);
+        }
+
+        tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        tbody td {
+            padding: 1rem;
+            color: var(--ubl-dark);
+            font-size: 0.9375rem;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.375rem 0.875rem;
+            border-radius: 8px;
+            font-size: 0.8125rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-present {
+            background: linear-gradient(135deg, #ECFDF5, #D1FAE5);
+            color: #065F46;
+        }
+
+        .status-late {
+            background: linear-gradient(135deg, #FFF7ED, #FFEDD5);
+            color: #9A3412;
+        }
+
+        .status-leave {
+            background: linear-gradient(135deg, #FEF2F2, #FEE2E2);
+            color: #991B1B;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1.125rem;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(36, 154, 204, 0.3);
+            border-top-color: var(--ubl-blue);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-bottom: 1rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 3rem;
+            color: #64748B;
+            font-size: 1.125rem;
+        }
+
+        @media (max-width: 768px) {
+            .header-title {
+                font-size: 2rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .controls-grid {
+                grid-template-columns: 1fr;
+            }
+
+            table {
+                font-size: 0.875rem;
+            }
+
+            thead th, tbody td {
+                padding: 0.75rem 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header-card">
+            <h1 class="header-title">Attendance Dashboard</h1>
+            <p class="header-subtitle">Learning & Development Analytics</p>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls-card">
+            <div class="controls-grid">
+                <div class="control-group">
+                    <label>📅 View Type</label>
+                    <select id="viewType" class="control-select">
+                        <option value="weekly">Weekly View</option>
+                        <option value="monthly">Monthly View</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label>🏢 Cluster</label>
+                    <select id="clusterFilter" class="control-select">
+                        <option value="all">All Clusters</option>
+                        <option value="South">South</option>
+                        <option value="Central">Central</option>
+                        <option value="North">North</option>
+                    </select>
+                </div>
+
+                <div class="control-group" id="weekSelector">
+                    <label>📆 Select Week</label>
+                    <select id="weekSelect" class="control-select">
+                        <!-- Populated by JS -->
+                    </select>
+                </div>
+
+                <div class="control-group" id="monthSelector" style="display: none;">
+                    <label>📆 Select Month</label>
+                    <select id="monthSelect" class="control-select">
+                        <!-- Populated by JS -->
+                    </select>
+                </div>
+            </div>
+
+            <button id="loadDataBtn" class="btn-primary">
+                📊 Load Dashboard
+            </button>
+        </div>
+
+        <!-- Statistics -->
+        <div class="stats-grid" id="statsGrid" style="display: none;">
+            <div class="stat-card">
+                <div class="stat-icon present">✓</div>
+                <div class="stat-label">Present Days</div>
+                <div class="stat-value" id="statPresent">0</div>
+                <div class="stat-subtitle">On time attendance</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon late">⏰</div>
+                <div class="stat-label">Late Days</div>
+                <div class="stat-value" id="statLate">0</div>
+                <div class="stat-subtitle">After 9:02 AM</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon leave">📋</div>
+                <div class="stat-label">Leave Days</div>
+                <div class="stat-value" id="statLeave">0</div>
+                <div class="stat-subtitle">Annual & sick leave</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon total">📊</div>
+                <div class="stat-label">Working Days</div>
+                <div class="stat-value" id="statTotal">0</div>
+                <div class="stat-subtitle">Excluding weekends</div>
+            </div>
+        </div>
+
+        <!-- Table -->
+        <div class="table-card" id="tableCard" style="display: none;">
+            <div class="table-header">
+                <h2 class="table-title" id="tableTitle">Attendance Details</h2>
+            </div>
+            <div class="table-container">
+                <table id="attendanceTable">
+                    <thead>
+                        <tr>
+                            <th>Employee Name</th>
+                            <th>Cluster</th>
+                            <th>Present</th>
+                            <th>Late</th>
+                            <th>Leave</th>
+                            <th>Total Days</th>
+                            <th>Attendance %</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loadingState" style="display: none;" class="loading">
+            <div class="loading-spinner"></div>
+            <p>Loading attendance data...</p>
+        </div>
+    </div>
+
+    <script>
+        const SHEET_URL = 'YOUR_GOOGLE_SHEETS_URL_HERE'; // Replace with your actual URL
+
+        // Initialize date selectors
+        function initializeDateSelectors() {
+            const today = new Date();
+            
+            // Generate last 8 weeks
+            const weekSelect = document.getElementById('weekSelect');
+            for (let i = 0; i < 8; i++) {
+                const weekStart = new Date(today);
+                weekStart.setDate(today.getDate() - (today.getDay() || 7) + 1 - (i * 7)); // Monday
+                const weekEnd = new Date(weekStart);
+                weekEnd.setDate(weekStart.getDate() + 4); // Friday
+                
+                const option = document.createElement('option');
+                option.value = JSON.stringify({ start: weekStart.toISOString(), end: weekEnd.toISOString() });
+                option.textContent = `${formatDate(weekStart)} - ${formatDate(weekEnd)}`;
+                if (i === 0) option.selected = true;
+                weekSelect.appendChild(option);
+            }
+
+            // Generate last 12 months
+            const monthSelect = document.getElementById('monthSelect');
+            for (let i = 0; i < 12; i++) {
+                const month = new Date(today.getFullYear(), today.getMonth() - i, 1);
+                const option = document.createElement('option');
+                option.value = JSON.stringify({ 
+                    year: month.getFullYear(), 
+                    month: month.getMonth() 
+                });
+                option.textContent = month.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+                if (i === 0) option.selected = true;
+                monthSelect.appendChild(option);
+            }
+        }
+
+        function formatDate(date) {
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        }
+
+        // Toggle between weekly and monthly view
+        document.getElementById('viewType').addEventListener('change', function() {
+            const isWeekly = this.value === 'weekly';
+            document.getElementById('weekSelector').style.display = isWeekly ? 'block' : 'none';
+            document.getElementById('monthSelector').style.display = isWeekly ? 'none' : 'block';
+        });
+
+        // Check if date is weekend
+        function isWeekend(date) {
+            const day = date.getDay();
+            return day === 0 || day === 6; // Sunday or Saturday
+        }
+
+        // Get working days in range (excluding weekends)
+        function getWorkingDays(startDate, endDate) {
+            let count = 0;
+            const current = new Date(startDate);
+            
+            while (current <= endDate) {
+                if (!isWeekend(current)) {
+                    count++;
+                }
+                current.setDate(current.getDate() + 1);
+            }
+            
+            return count;
+        }
+
+        // Parse date from different formats
+        function parseDate(dateStr) {
+            // Handle MM/DD/YYYY format
+            if (dateStr.includes('/')) {
+                return new Date(dateStr);
+            }
+            // Handle other formats
+            return new Date(dateStr);
+        }
+
+        // Process attendance data
+        function processAttendanceData(data, startDate, endDate, clusterFilter) {
+            const employeeStats = {};
+            
+            data.forEach(row => {
+                const date = parseDate(row.date || row.Date);
+                const name = row.name || row.Name || row['Employee Name'];
+                const cluster = row.cluster || row.Cluster;
+                const status = row.status || row.Status;
+                
+                // Filter by date range
+                if (date < startDate || date > endDate) return;
+                
+                // Filter by cluster
+                if (clusterFilter !== 'all' && cluster !== clusterFilter) return;
+                
+                // Skip weekends unless marked as present
+                if (isWeekend(date) && status !== 'Present') return;
+                
+                // Initialize employee stats
+                if (!employeeStats[name]) {
+                    employeeStats[name] = {
+                        name: name,
+                        cluster: cluster,
+                        present: 0,
+                        late: 0,
+                        leave: 0
+                    };
+                }
+                
+                // Count attendance
+                if (status === 'Present') {
+                    employeeStats[name].present++;
+                } else if (status === 'Late') {
+                    employeeStats[name].late++;
+                } else if (status.includes('Leave')) {
+                    employeeStats[name].leave++;
+                }
+            });
+            
+            return Object.values(employeeStats);
+        }
+
+        // Calculate statistics
+        function calculateStats(employeeData, workingDays) {
+            let totalPresent = 0;
+            let totalLate = 0;
+            let totalLeave = 0;
+            
+            employeeData.forEach(emp => {
+                totalPresent += emp.present;
+                totalLate += emp.late;
+                totalLeave += emp.leave;
+            });
+            
+            return {
+                present: totalPresent,
+                late: totalLate,
+                leave: totalLeave,
+                workingDays: workingDays
+            };
+        }
+
+        // Update dashboard
+        function updateDashboard(employeeData, stats) {
+            // Update statistics
+            document.getElementById('statPresent').textContent = stats.present;
+            document.getElementById('statLate').textContent = stats.late;
+            document.getElementById('statLeave').textContent = stats.leave;
+            document.getElementById('statTotal').textContent = stats.workingDays;
+            
+            // Update table
+            const tableBody = document.getElementById('tableBody');
+            tableBody.innerHTML = '';
+            
+            employeeData.forEach(emp => {
+                const totalDays = emp.present + emp.late + emp.leave;
+                const attendanceRate = totalDays > 0 
+                    ? Math.round((emp.present + emp.late) / totalDays * 100) 
+                    : 0;
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><strong>${emp.name}</strong></td>
+                    <td>${emp.cluster}</td>
+                    <td><span class="status-badge status-present">${emp.present}</span></td>
+                    <td><span class="status-badge status-late">${emp.late}</span></td>
+                    <td><span class="status-badge status-leave">${emp.leave}</span></td>
+                    <td><strong>${totalDays}</strong></td>
+                    <td><strong>${attendanceRate}%</strong></td>
+                `;
+                tableBody.appendChild(row);
+            });
+            
+            // Show elements
+            document.getElementById('statsGrid').style.display = 'grid';
+            document.getElementById('tableCard').style.display = 'block';
+        }
+
+        // Load data button handler
+        document.getElementById('loadDataBtn').addEventListener('click', async function() {
+            const viewType = document.getElementById('viewType').value;
+            const clusterFilter = document.getElementById('clusterFilter').value;
+            
+            let startDate, endDate, periodText;
+            
+            if (viewType === 'weekly') {
+                const weekData = JSON.parse(document.getElementById('weekSelect').value);
+                startDate = new Date(weekData.start);
+                endDate = new Date(weekData.end);
+                periodText = `Week of ${formatDate(startDate)}`;
+            } else {
+                const monthData = JSON.parse(document.getElementById('monthSelect').value);
+                startDate = new Date(monthData.year, monthData.month, 1);
+                endDate = new Date(monthData.year, monthData.month + 1, 0);
+                periodText = startDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+            }
+            
+            // Update table title
+            document.getElementById('tableTitle').textContent = 
+                `Attendance Details - ${periodText}${clusterFilter !== 'all' ? ` (${clusterFilter})` : ''}`;
+            
+            // Show loading
+            document.getElementById('loadingState').style.display = 'block';
+            document.getElementById('statsGrid').style.display = 'none';
+            document.getElementById('tableCard').style.display = 'none';
+            
+            try {
+                // Fetch data from Google Sheets
+                const response = await fetch(SHEET_URL);
+                const data = await response.json();
+                
+                // Process data
+                const workingDays = getWorkingDays(startDate, endDate);
+                const employeeData = processAttendanceData(data, startDate, endDate, clusterFilter);
+                const stats = calculateStats(employeeData, workingDays);
+                
+                // Update dashboard
+                updateDashboard(employeeData, stats);
+                
+            } catch (error) {
+                console.error('Error loading data:', error);
+                alert('Failed to load attendance data. Please check the sheet URL and try again.');
+            } finally {
+                document.getElementById('loadingState').style.display = 'none';
+            }
+        });
+
+        // Initialize on page load
+        window.onload = function() {
+            initializeDateSelectors();
+        };
+    </script>
+</body>
+</html>
