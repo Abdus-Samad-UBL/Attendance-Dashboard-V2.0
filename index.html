@@ -977,9 +977,10 @@
             
             employeeData.forEach(emp => {
                 const totalDays = emp.ontime + emp.late + emp.annualLeave + emp.casualLeave;
-                // Calculate on-time percentage (how many times marked present/on-time)
-                const ontimeRate = totalDays > 0 
-                    ? Math.round((emp.ontime / totalDays) * 100) 
+                const daysPresent = emp.ontime + emp.late; // Only days actually present
+                // Calculate on-time percentage based on days present only (excluding leaves)
+                const ontimeRate = daysPresent > 0 
+                    ? Math.round((emp.ontime / daysPresent) * 100) 
                     : 0;
                 
                 const rowId = emp.name.replace(/\s/g, '-');
@@ -1036,7 +1037,7 @@
                 ['Leave Days', currentStats.leave],
                 ['Total Working Days', currentStats.workingDays],
                 [],
-                ['Note: On-Time % shows percentage of days marked as Present/On-Time'],
+                ['Note: On-Time % = (On-Time Days / Days Present) × 100 (excludes leaves from calculation)'],
                 [],
                 ['Employee Details'],
                 ['Employee Name', 'Cluster', 'On-Time', 'Late', 'Annual Leave', 'Casual Leave', 'Total Days', 'On-Time %']
@@ -1044,9 +1045,10 @@
             
             currentEmployeeData.forEach(emp => {
                 const totalDays = emp.ontime + emp.late + emp.annualLeave + emp.casualLeave;
-                // Calculate on-time percentage
-                const ontimeRate = totalDays > 0 
-                    ? Math.round((emp.ontime / totalDays) * 100) 
+                const daysPresent = emp.ontime + emp.late;
+                // Calculate on-time percentage based on days present only
+                const ontimeRate = daysPresent > 0 
+                    ? Math.round((emp.ontime / daysPresent) * 100) 
                     : 0;
                 
                 summaryData.push([
