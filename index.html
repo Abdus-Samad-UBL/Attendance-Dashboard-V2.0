@@ -627,7 +627,7 @@
         <div class="stats-grid" id="statsGrid" style="display: none;">
             <div class="stat-card">
                 <div class="stat-icon present">✓</div>
-                <div class="stat-label">On-Time Days</div>
+                <div class="stat-label">On-Time Personnel</div>
                 <div class="stat-value" id="statPresent">0</div>
                 <div class="stat-subtitle">Punctual attendance</div>
             </div>
@@ -636,7 +636,7 @@
                 <div class="stat-icon late">⏰</div>
                 <div class="stat-label">Late Days</div>
                 <div class="stat-value" id="statLate">0</div>
-                <div class="stat-subtitle">After 9:02 AM</div>
+                <div class="stat-subtitle">After 9:00 AM</div>
             </div>
 
             <div class="stat-card">
@@ -785,6 +785,52 @@
             return new Date(dateStr);
         }
 
+        // Parse time and convert to PKT
+        function parseTime(timeStr) {
+            if (!timeStr || timeStr === 'N/A') {
+                return 'N/A';
+            }
+            
+            try {
+                // If it's an ISO format timestamp
+                if (timeStr.includes('T') && timeStr.includes('Z')) {
+                    const date = new Date(timeStr);
+                    // Convert to Pakistan time (UTC+5)
+                    return date.toLocaleTimeString('en-US', { 
+                        timeZone: 'Asia/Karachi',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hour12: true
+                    });
+                }
+                
+                // If it's already a time string
+                if (timeStr.includes(':')) {
+                    // Check if it needs conversion
+                    const timeParts = timeStr.match(/(\d+):(\d+):?(\d+)?\s*(AM|PM)?/i);
+                    if (timeParts) {
+                        return timeStr;
+                    }
+                }
+                
+                // Try to parse as date
+                const date = new Date(timeStr);
+                if (!isNaN(date.getTime())) {
+                    return date.toLocaleTimeString('en-US', { 
+                        timeZone: 'Asia/Karachi',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hour12: true
+                    });
+                }
+                
+                return timeStr;
+            } catch (error) {
+                console.error('Error parsing time:', error);
+                return timeStr;
+            }
+        }
+
         // Categorize leave type
         function getLeaveType(status) {
             if (status.toLowerCase().includes('annual')) {
@@ -805,7 +851,7 @@
                 const name = row.name || row.Name || row['Employee Name'];
                 const cluster = row.cluster || row.Cluster;
                 const status = row.status || row.Status;
-                const time = row.time || row.Time || 'N/A';
+                const time = parseTime(row.time || row.Time || 'N/A');
                 
                 // Filter by date range
                 if (date < startDate || date > endDate) return;
@@ -931,8 +977,9 @@
             
             employeeData.forEach(emp => {
                 const totalDays = emp.ontime + emp.late + emp.annualLeave + emp.casualLeave;
+                // Count leaves as present for attendance percentage calculation
                 const attendanceRate = totalDays > 0 
-                    ? Math.round((emp.ontime + emp.late) / totalDays * 100) 
+                    ? Math.round((emp.ontime + emp.late + emp.annualLeave + emp.casualLeave) / totalDays * 100) 
                     : 0;
                 
                 const rowId = emp.name.replace(/\s/g, '-');
@@ -981,7 +1028,7 @@
             const summaryData = [
                 ['UBL Attendance Dashboard'],
                 ['Period:', document.getElementById('tableTitle').textContent],
-                ['Generated:', new Date().toLocaleString()],
+                ['Generated:', new Date().toLocaleString('en-US', { timeZone: 'Asia/Karachi' })],
                 [],
                 ['Summary Statistics'],
                 ['On-Time Days', currentStats.ontime],
@@ -989,14 +1036,17 @@
                 ['Leave Days', currentStats.leave],
                 ['Total Working Days', currentStats.workingDays],
                 [],
+                ['Note: Attendance % includes leaves as present (informed beforehand)'],
+                [],
                 ['Employee Details'],
                 ['Employee Name', 'Cluster', 'On-Time', 'Late', 'Annual Leave', 'Casual Leave', 'Total Days', 'Attendance %']
             ];
             
             currentEmployeeData.forEach(emp => {
                 const totalDays = emp.ontime + emp.late + emp.annualLeave + emp.casualLeave;
+                // Count leaves as present for attendance percentage
                 const attendanceRate = totalDays > 0 
-                    ? Math.round((emp.ontime + emp.late) / totalDays * 100) 
+                    ? Math.round((emp.ontime + emp.late + emp.annualLeave + emp.casualLeave) / totalDays * 100) 
                     : 0;
                 
                 summaryData.push([
@@ -1018,19 +1068,20 @@
             const detailData = [
                 ['Detailed Attendance Records'],
                 [],
-                ['Employee Name', 'Date', 'Day', 'Status', 'Time']
+                ['Employee Name', 'Date', 'Day', 'Status', 'Time (PKT)']
             ];
             
             currentRawData.forEach(record => {
                 const date = parseDate(record.date || record.Date);
                 if (date >= currentDateRange.start && date <= currentDateRange.end) {
                     const status = record.status === 'Present' ? 'On-Time' : record.status;
+                    const time = parseTime(record.time || record.Time || 'N/A');
                     detailData.push([
                         record.name || record.Name,
                         formatDateTime(date),
                         date.toLocaleDateString('en-US', { weekday: 'long' }),
                         status,
-                        record.time || record.Time || 'N/A'
+                        time
                     ]);
                 }
             });
