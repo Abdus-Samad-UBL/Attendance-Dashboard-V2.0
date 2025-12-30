@@ -627,7 +627,7 @@
         <div class="stats-grid" id="statsGrid" style="display: none;">
             <div class="stat-card">
                 <div class="stat-icon present">✓</div>
-                <div class="stat-label">On-Time Personnel</div>
+                <div class="stat-label">On-Time Days</div>
                 <div class="stat-value" id="statPresent">0</div>
                 <div class="stat-subtitle">Punctual attendance</div>
             </div>
@@ -636,7 +636,7 @@
                 <div class="stat-icon late">⏰</div>
                 <div class="stat-label">Late Days</div>
                 <div class="stat-value" id="statLate">0</div>
-                <div class="stat-subtitle">After 9:00 AM</div>
+                <div class="stat-subtitle">After 9:02 AM</div>
             </div>
 
             <div class="stat-card">
@@ -674,7 +674,7 @@
                             <th>Annual Leave</th>
                             <th>Casual Leave</th>
                             <th>Total Days</th>
-                            <th>Attendance %</th>
+                            <th>On-Time %</th>
                         </tr>
                     </thead>
                     <tbody id="tableBody">
@@ -977,9 +977,9 @@
             
             employeeData.forEach(emp => {
                 const totalDays = emp.ontime + emp.late + emp.annualLeave + emp.casualLeave;
-                // Count leaves as present for attendance percentage calculation
-                const attendanceRate = totalDays > 0 
-                    ? Math.round((emp.ontime + emp.late + emp.annualLeave + emp.casualLeave) / totalDays * 100) 
+                // Calculate on-time percentage (how many times marked present/on-time)
+                const ontimeRate = totalDays > 0 
+                    ? Math.round((emp.ontime / totalDays) * 100) 
                     : 0;
                 
                 const rowId = emp.name.replace(/\s/g, '-');
@@ -999,7 +999,7 @@
                     <td><span class="status-badge status-annual">${emp.annualLeave}</span></td>
                     <td><span class="status-badge status-casual">${emp.casualLeave}</span></td>
                     <td><strong>${totalDays}</strong></td>
-                    <td><strong>${attendanceRate}%</strong></td>
+                    <td><strong>${ontimeRate}%</strong></td>
                 `;
                 tableBody.appendChild(row);
                 
@@ -1036,17 +1036,17 @@
                 ['Leave Days', currentStats.leave],
                 ['Total Working Days', currentStats.workingDays],
                 [],
-                ['Note: Attendance % includes leaves as present (informed beforehand)'],
+                ['Note: On-Time % shows percentage of days marked as Present/On-Time'],
                 [],
                 ['Employee Details'],
-                ['Employee Name', 'Cluster', 'On-Time', 'Late', 'Annual Leave', 'Casual Leave', 'Total Days', 'Attendance %']
+                ['Employee Name', 'Cluster', 'On-Time', 'Late', 'Annual Leave', 'Casual Leave', 'Total Days', 'On-Time %']
             ];
             
             currentEmployeeData.forEach(emp => {
                 const totalDays = emp.ontime + emp.late + emp.annualLeave + emp.casualLeave;
-                // Count leaves as present for attendance percentage
-                const attendanceRate = totalDays > 0 
-                    ? Math.round((emp.ontime + emp.late + emp.annualLeave + emp.casualLeave) / totalDays * 100) 
+                // Calculate on-time percentage
+                const ontimeRate = totalDays > 0 
+                    ? Math.round((emp.ontime / totalDays) * 100) 
                     : 0;
                 
                 summaryData.push([
@@ -1057,7 +1057,7 @@
                     emp.annualLeave,
                     emp.casualLeave,
                     totalDays,
-                    attendanceRate + '%'
+                    ontimeRate + '%'
                 ]);
             });
             
