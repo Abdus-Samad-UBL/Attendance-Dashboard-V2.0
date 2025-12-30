@@ -302,12 +302,34 @@
             margin-bottom: 1.5rem;
             padding-bottom: 1rem;
             border-bottom: 2px solid rgba(36, 154, 204, 0.2);
+            flex-wrap: wrap;
+            gap: 1rem;
         }
 
         .table-title {
             font-size: 1.5rem;
             font-weight: 700;
             color: var(--ubl-navy);
+        }
+
+        .btn-export {
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 0.9375rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .btn-export:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
         }
 
         .table-container {
@@ -385,6 +407,119 @@
         .status-leave {
             background: linear-gradient(135deg, #FEF2F2, #FEE2E2);
             color: #991B1B;
+        }
+
+        .status-annual {
+            background: linear-gradient(135deg, #EFF6FF, #DBEAFE);
+            color: #1E40AF;
+        }
+
+        .status-casual {
+            background: linear-gradient(135deg, #FEF3C7, #FDE68A);
+            color: #92400E;
+        }
+
+        .expand-btn {
+            background: none;
+            border: none;
+            color: var(--ubl-blue);
+            cursor: pointer;
+            font-size: 1.25rem;
+            padding: 0.25rem 0.5rem;
+            transition: all 0.3s ease;
+            border-radius: 6px;
+        }
+
+        .expand-btn:hover {
+            background: rgba(36, 154, 204, 0.1);
+            transform: scale(1.1);
+        }
+
+        .expand-btn.expanded {
+            transform: rotate(180deg);
+        }
+
+        .detail-row {
+            display: none;
+            background: linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%);
+        }
+
+        .detail-row.show {
+            display: table-row;
+        }
+
+        .detail-cell {
+            padding: 1.5rem !important;
+            border-top: 2px solid rgba(36, 154, 204, 0.2);
+        }
+
+        .detail-content {
+            background: white;
+            border-radius: 12px;
+            padding: 1.25rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .detail-title {
+            font-size: 0.9375rem;
+            font-weight: 700;
+            color: var(--ubl-navy);
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        .day-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 0.75rem;
+        }
+
+        .day-item {
+            background: linear-gradient(135deg, #FFFFFF 0%, #F8FAFB 100%);
+            border: 1px solid #E5E7EB;
+            border-left: 3px solid;
+            border-radius: 8px;
+            padding: 0.75rem;
+            transition: all 0.3s ease;
+        }
+
+        .day-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .day-item.ontime {
+            border-left-color: #10B981;
+        }
+
+        .day-item.late {
+            border-left-color: #F97316;
+        }
+
+        .day-item.leave {
+            border-left-color: #EF4444;
+        }
+
+        .day-date {
+            font-size: 0.8125rem;
+            font-weight: 600;
+            color: #64748B;
+            margin-bottom: 0.25rem;
+        }
+
+        .day-status {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.25rem;
+        }
+
+        .day-time {
+            font-size: 0.875rem;
+            color: var(--ubl-dark);
+            font-weight: 500;
         }
 
         .loading {
@@ -492,9 +627,9 @@
         <div class="stats-grid" id="statsGrid" style="display: none;">
             <div class="stat-card">
                 <div class="stat-icon present">✓</div>
-                <div class="stat-label">Present Days</div>
+                <div class="stat-label">On-Time Days</div>
                 <div class="stat-value" id="statPresent">0</div>
-                <div class="stat-subtitle">On time attendance</div>
+                <div class="stat-subtitle">Punctual attendance</div>
             </div>
 
             <div class="stat-card">
@@ -508,7 +643,7 @@
                 <div class="stat-icon leave">📋</div>
                 <div class="stat-label">Leave Days</div>
                 <div class="stat-value" id="statLeave">0</div>
-                <div class="stat-subtitle">Annual & sick leave</div>
+                <div class="stat-subtitle">Annual & casual leave</div>
             </div>
 
             <div class="stat-card">
@@ -523,16 +658,21 @@
         <div class="table-card" id="tableCard" style="display: none;">
             <div class="table-header">
                 <h2 class="table-title" id="tableTitle">Attendance Details</h2>
+                <button id="exportBtn" class="btn-export">
+                    📥 Export to Excel
+                </button>
             </div>
             <div class="table-container">
                 <table id="attendanceTable">
                     <thead>
                         <tr>
+                            <th>Details</th>
                             <th>Employee Name</th>
                             <th>Cluster</th>
-                            <th>Present</th>
+                            <th>On-Time</th>
                             <th>Late</th>
-                            <th>Leave</th>
+                            <th>Annual Leave</th>
+                            <th>Casual Leave</th>
                             <th>Total Days</th>
                             <th>Attendance %</th>
                         </tr>
@@ -551,8 +691,14 @@
         </div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script>
-        const SHEET_URL = 'https://script.google.com/macros/s/AKfycbyjgb7lTC1YaON02CXgddYYLXZyUgZcrsa7gPn3-SOqFQSIhXFoB5M3slgrATyVM67F/exec'; // Replace with your actual URL
+        const SHEET_URL = 'YOUR_GOOGLE_SHEETS_URL_HERE'; // Replace with your actual URL
+
+        let currentEmployeeData = [];
+        let currentStats = {};
+        let currentRawData = [];
+        let currentDateRange = {};
 
         // Initialize date selectors
         function initializeDateSelectors() {
@@ -590,6 +736,15 @@
 
         function formatDate(date) {
             return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        }
+
+        function formatDateTime(date) {
+            return date.toLocaleDateString('en-US', { 
+                weekday: 'short', 
+                month: 'short', 
+                day: 'numeric',
+                year: 'numeric'
+            });
         }
 
         // Toggle between weekly and monthly view
@@ -630,15 +785,27 @@
             return new Date(dateStr);
         }
 
+        // Categorize leave type
+        function getLeaveType(status) {
+            if (status.toLowerCase().includes('annual')) {
+                return 'Annual Leave';
+            } else if (status.toLowerCase().includes('personal') || status.toLowerCase().includes('sick') || status.toLowerCase().includes('casual')) {
+                return 'Casual Leave';
+            }
+            return status;
+        }
+
         // Process attendance data
         function processAttendanceData(data, startDate, endDate, clusterFilter) {
             const employeeStats = {};
+            const detailedRecords = {};
             
             data.forEach(row => {
                 const date = parseDate(row.date || row.Date);
                 const name = row.name || row.Name || row['Employee Name'];
                 const cluster = row.cluster || row.Cluster;
                 const status = row.status || row.Status;
+                const time = row.time || row.Time || 'N/A';
                 
                 // Filter by date range
                 if (date < startDate || date > endDate) return;
@@ -654,49 +821,106 @@
                     employeeStats[name] = {
                         name: name,
                         cluster: cluster,
-                        present: 0,
+                        ontime: 0,
                         late: 0,
-                        leave: 0
+                        annualLeave: 0,
+                        casualLeave: 0
                     };
+                    detailedRecords[name] = [];
                 }
+                
+                // Store detailed record
+                detailedRecords[name].push({
+                    date: date,
+                    status: status,
+                    time: time
+                });
                 
                 // Count attendance
                 if (status === 'Present') {
-                    employeeStats[name].present++;
+                    employeeStats[name].ontime++;
                 } else if (status === 'Late') {
                     employeeStats[name].late++;
-                } else if (status.includes('Leave')) {
-                    employeeStats[name].leave++;
+                } else if (status.toLowerCase().includes('annual')) {
+                    employeeStats[name].annualLeave++;
+                } else if (status.toLowerCase().includes('personal') || status.toLowerCase().includes('sick') || status.toLowerCase().includes('casual')) {
+                    employeeStats[name].casualLeave++;
                 }
             });
             
-            return Object.values(employeeStats);
+            return {
+                stats: Object.values(employeeStats),
+                details: detailedRecords
+            };
         }
 
         // Calculate statistics
         function calculateStats(employeeData, workingDays) {
-            let totalPresent = 0;
+            let totalOntime = 0;
             let totalLate = 0;
             let totalLeave = 0;
             
             employeeData.forEach(emp => {
-                totalPresent += emp.present;
+                totalOntime += emp.ontime;
                 totalLate += emp.late;
-                totalLeave += emp.leave;
+                totalLeave += emp.annualLeave + emp.casualLeave;
             });
             
             return {
-                present: totalPresent,
+                ontime: totalOntime,
                 late: totalLate,
                 leave: totalLeave,
                 workingDays: workingDays
             };
         }
 
+        // Toggle detail row
+        function toggleDetails(employeeName) {
+            const detailRow = document.getElementById(`detail-${employeeName.replace(/\s/g, '-')}`);
+            const expandBtn = document.getElementById(`expand-${employeeName.replace(/\s/g, '-')}`);
+            
+            if (detailRow.classList.contains('show')) {
+                detailRow.classList.remove('show');
+                expandBtn.classList.remove('expanded');
+            } else {
+                detailRow.classList.add('show');
+                expandBtn.classList.add('expanded');
+            }
+        }
+
+        // Create detail row content
+        function createDetailContent(employeeName, details) {
+            const records = details[employeeName] || [];
+            records.sort((a, b) => a.date - b.date);
+            
+            let html = '<div class="detail-content">';
+            html += '<div class="detail-title">📅 Individual Day Records</div>';
+            html += '<div class="day-grid">';
+            
+            records.forEach(record => {
+                const statusClass = record.status === 'Present' ? 'ontime' : 
+                                  record.status === 'Late' ? 'late' : 'leave';
+                const statusText = record.status === 'Present' ? 'On-Time' : record.status;
+                const statusColor = record.status === 'Present' ? '#10B981' : 
+                                  record.status === 'Late' ? '#F97316' : '#EF4444';
+                
+                html += `
+                    <div class="day-item ${statusClass}">
+                        <div class="day-date">${formatDateTime(record.date)}</div>
+                        <div class="day-status" style="color: ${statusColor}">${statusText}</div>
+                        <div class="day-time">⏰ ${record.time}</div>
+                    </div>
+                `;
+            });
+            
+            html += '</div></div>';
+            return html;
+        }
+
         // Update dashboard
-        function updateDashboard(employeeData, stats) {
+        function updateDashboard(employeeData, details, stats) {
             // Update statistics
-            document.getElementById('statPresent').textContent = stats.present;
+            document.getElementById('statPresent').textContent = stats.ontime;
             document.getElementById('statLate').textContent = stats.late;
             document.getElementById('statLeave').textContent = stats.leave;
             document.getElementById('statTotal').textContent = stats.workingDays;
@@ -706,28 +930,123 @@
             tableBody.innerHTML = '';
             
             employeeData.forEach(emp => {
-                const totalDays = emp.present + emp.late + emp.leave;
+                const totalDays = emp.ontime + emp.late + emp.annualLeave + emp.casualLeave;
                 const attendanceRate = totalDays > 0 
-                    ? Math.round((emp.present + emp.late) / totalDays * 100) 
+                    ? Math.round((emp.ontime + emp.late) / totalDays * 100) 
                     : 0;
                 
+                const rowId = emp.name.replace(/\s/g, '-');
+                
+                // Main row
                 const row = document.createElement('tr');
                 row.innerHTML = `
+                    <td>
+                        <button class="expand-btn" id="expand-${rowId}" onclick="toggleDetails('${emp.name}')">
+                            ▼
+                        </button>
+                    </td>
                     <td><strong>${emp.name}</strong></td>
                     <td>${emp.cluster}</td>
-                    <td><span class="status-badge status-present">${emp.present}</span></td>
+                    <td><span class="status-badge status-present">${emp.ontime}</span></td>
                     <td><span class="status-badge status-late">${emp.late}</span></td>
-                    <td><span class="status-badge status-leave">${emp.leave}</span></td>
+                    <td><span class="status-badge status-annual">${emp.annualLeave}</span></td>
+                    <td><span class="status-badge status-casual">${emp.casualLeave}</span></td>
                     <td><strong>${totalDays}</strong></td>
                     <td><strong>${attendanceRate}%</strong></td>
                 `;
                 tableBody.appendChild(row);
+                
+                // Detail row
+                const detailRow = document.createElement('tr');
+                detailRow.className = 'detail-row';
+                detailRow.id = `detail-${rowId}`;
+                detailRow.innerHTML = `
+                    <td colspan="9" class="detail-cell">
+                        ${createDetailContent(emp.name, details)}
+                    </td>
+                `;
+                tableBody.appendChild(detailRow);
             });
             
             // Show elements
             document.getElementById('statsGrid').style.display = 'grid';
             document.getElementById('tableCard').style.display = 'block';
         }
+
+        // Export to Excel
+        function exportToExcel() {
+            const wb = XLSX.utils.book_new();
+            
+            // Summary Sheet
+            const summaryData = [
+                ['UBL Attendance Dashboard'],
+                ['Period:', document.getElementById('tableTitle').textContent],
+                ['Generated:', new Date().toLocaleString()],
+                [],
+                ['Summary Statistics'],
+                ['On-Time Days', currentStats.ontime],
+                ['Late Days', currentStats.late],
+                ['Leave Days', currentStats.leave],
+                ['Total Working Days', currentStats.workingDays],
+                [],
+                ['Employee Details'],
+                ['Employee Name', 'Cluster', 'On-Time', 'Late', 'Annual Leave', 'Casual Leave', 'Total Days', 'Attendance %']
+            ];
+            
+            currentEmployeeData.forEach(emp => {
+                const totalDays = emp.ontime + emp.late + emp.annualLeave + emp.casualLeave;
+                const attendanceRate = totalDays > 0 
+                    ? Math.round((emp.ontime + emp.late) / totalDays * 100) 
+                    : 0;
+                
+                summaryData.push([
+                    emp.name,
+                    emp.cluster,
+                    emp.ontime,
+                    emp.late,
+                    emp.annualLeave,
+                    emp.casualLeave,
+                    totalDays,
+                    attendanceRate + '%'
+                ]);
+            });
+            
+            const ws1 = XLSX.utils.aoa_to_sheet(summaryData);
+            XLSX.utils.book_append_sheet(wb, ws1, 'Summary');
+            
+            // Detailed Records Sheet
+            const detailData = [
+                ['Detailed Attendance Records'],
+                [],
+                ['Employee Name', 'Date', 'Day', 'Status', 'Time']
+            ];
+            
+            currentRawData.forEach(record => {
+                const date = parseDate(record.date || record.Date);
+                if (date >= currentDateRange.start && date <= currentDateRange.end) {
+                    const status = record.status === 'Present' ? 'On-Time' : record.status;
+                    detailData.push([
+                        record.name || record.Name,
+                        formatDateTime(date),
+                        date.toLocaleDateString('en-US', { weekday: 'long' }),
+                        status,
+                        record.time || record.Time || 'N/A'
+                    ]);
+                }
+            });
+            
+            const ws2 = XLSX.utils.aoa_to_sheet(detailData);
+            XLSX.utils.book_append_sheet(wb, ws2, 'Detailed Records');
+            
+            // Generate filename
+            const filename = `UBL_Attendance_${new Date().toISOString().split('T')[0]}.xlsx`;
+            
+            // Save file
+            XLSX.writeFile(wb, filename);
+        }
+
+        // Export button handler
+        document.getElementById('exportBtn').addEventListener('click', exportToExcel);
 
         // Load data button handler
         document.getElementById('loadDataBtn').addEventListener('click', async function() {
@@ -748,6 +1067,9 @@
                 periodText = startDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
             }
             
+            // Store date range for export
+            currentDateRange = { start: startDate, end: endDate };
+            
             // Update table title
             document.getElementById('tableTitle').textContent = 
                 `Attendance Details - ${periodText}${clusterFilter !== 'all' ? ` (${clusterFilter})` : ''}`;
@@ -762,13 +1084,20 @@
                 const response = await fetch(SHEET_URL);
                 const data = await response.json();
                 
+                // Store raw data for export
+                currentRawData = data;
+                
                 // Process data
                 const workingDays = getWorkingDays(startDate, endDate);
-                const employeeData = processAttendanceData(data, startDate, endDate, clusterFilter);
-                const stats = calculateStats(employeeData, workingDays);
+                const processed = processAttendanceData(data, startDate, endDate, clusterFilter);
+                const stats = calculateStats(processed.stats, workingDays);
+                
+                // Store for export
+                currentEmployeeData = processed.stats;
+                currentStats = stats;
                 
                 // Update dashboard
-                updateDashboard(employeeData, stats);
+                updateDashboard(processed.stats, processed.details, stats);
                 
             } catch (error) {
                 console.error('Error loading data:', error);
@@ -777,6 +1106,9 @@
                 document.getElementById('loadingState').style.display = 'none';
             }
         });
+
+        // Make toggleDetails global
+        window.toggleDetails = toggleDetails;
 
         // Initialize on page load
         window.onload = function() {
