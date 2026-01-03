@@ -332,6 +332,178 @@
             box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
         }
 
+        .btn-holiday {
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 0.9375rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .btn-holiday:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #FFFFFF 0%, #F8FAFB 100%);
+            border-radius: 24px;
+            padding: 2.5rem;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 
+                0 30px 90px rgba(0, 0, 0, 0.5),
+                0 10px 30px rgba(36, 154, 204, 0.3);
+            animation: slideInUp 0.4s ease-out;
+            position: relative;
+        }
+
+        .modal-header {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--ubl-navy);
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .modal-input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-input-group label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 700;
+            color: var(--ubl-navy);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        .modal-input {
+            width: 100%;
+            padding: 0.875rem 1.25rem;
+            border: 2px solid #E5E7EB;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .modal-input:focus {
+            outline: none;
+            border-color: var(--ubl-blue);
+            box-shadow: 0 0 0 3px rgba(36, 154, 204, 0.15);
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .btn-modal-primary {
+            flex: 1;
+            padding: 1rem;
+            background: linear-gradient(135deg, var(--ubl-navy) 0%, var(--ubl-accent) 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-modal-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(5, 65, 102, 0.3);
+        }
+
+        .btn-modal-secondary {
+            flex: 1;
+            padding: 1rem;
+            background: white;
+            color: var(--ubl-navy);
+            border: 2px solid var(--ubl-navy);
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-modal-secondary:hover {
+            background: var(--ubl-light);
+        }
+
+        .holiday-list {
+            margin-top: 1.5rem;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .holiday-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.875rem;
+            background: linear-gradient(135deg, #FFF7ED 0%, #FFEDD5 100%);
+            border-radius: 10px;
+            margin-bottom: 0.75rem;
+            border-left: 4px solid #F59E0B;
+        }
+
+        .holiday-date {
+            font-weight: 600;
+            color: var(--ubl-navy);
+        }
+
+        .holiday-name {
+            color: #64748B;
+            font-size: 0.875rem;
+        }
+
+        .btn-remove-holiday {
+            padding: 0.375rem 0.75rem;
+            background: #EF4444;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-remove-holiday:hover {
+            background: #DC2626;
+        }
+
         .table-container {
             overflow-x: auto;
         }
@@ -588,6 +760,7 @@
                 <div class="control-group">
                     <label>📅 View Type</label>
                     <select id="viewType" class="control-select">
+                        <option value="">-- Select Type --</option>
                         <option value="weekly">Weekly View</option>
                         <option value="monthly">Monthly View</option>
                     </select>
@@ -596,6 +769,7 @@
                 <div class="control-group">
                     <label>🏢 Cluster</label>
                     <select id="clusterFilter" class="control-select">
+                        <option value="">-- Select Cluster --</option>
                         <option value="all">All Clusters</option>
                         <option value="South">South</option>
                         <option value="Central">Central</option>
@@ -603,9 +777,10 @@
                     </select>
                 </div>
 
-                <div class="control-group" id="weekSelector">
+                <div class="control-group" id="weekSelector" style="display: none;">
                     <label>📆 Select Week</label>
                     <select id="weekSelect" class="control-select">
+                        <option value="">-- Select Period --</option>
                         <!-- Populated by JS -->
                     </select>
                 </div>
@@ -613,6 +788,7 @@
                 <div class="control-group" id="monthSelector" style="display: none;">
                     <label>📆 Select Month</label>
                     <select id="monthSelect" class="control-select">
+                        <option value="">-- Select Period --</option>
                         <!-- Populated by JS -->
                     </select>
                 </div>
@@ -658,9 +834,14 @@
         <div class="table-card" id="tableCard" style="display: none;">
             <div class="table-header">
                 <h2 class="table-title" id="tableTitle">Attendance Details</h2>
-                <button id="exportBtn" class="btn-export">
-                    📥 Export to Excel
-                </button>
+                <div style="display: flex; gap: 1rem;">
+                    <button id="holidayBtn" class="btn-holiday">
+                        🗓️ Manage Holidays
+                    </button>
+                    <button id="exportBtn" class="btn-export">
+                        📥 Export to Excel
+                    </button>
+                </div>
             </div>
             <div class="table-container">
                 <table id="attendanceTable">
@@ -691,14 +872,152 @@
         </div>
     </div>
 
+    <!-- Holiday Management Modal -->
+    <div id="holidayModal" class="modal">
+        <div class="modal-content">
+            <h2 class="modal-header">🗓️ Manage Holidays</h2>
+            
+            <!-- Password Input (shown first time) -->
+            <div id="passwordSection">
+                <div class="modal-input-group">
+                    <label>🔐 Admin Password</label>
+                    <input type="password" id="adminPassword" class="modal-input" placeholder="Enter admin password">
+                </div>
+                <div class="modal-buttons">
+                    <button id="verifyPasswordBtn" class="btn-modal-primary">Verify</button>
+                    <button id="closePasswordBtn" class="btn-modal-secondary">Cancel</button>
+                </div>
+            </div>
+
+            <!-- Holiday Management (shown after password verification) -->
+            <div id="holidayManagementSection" style="display: none;">
+                <div class="modal-input-group">
+                    <label>📅 Holiday Date</label>
+                    <input type="date" id="holidayDate" class="modal-input">
+                </div>
+                <div class="modal-input-group">
+                    <label>🎉 Holiday Name</label>
+                    <input type="text" id="holidayName" class="modal-input" placeholder="e.g., Eid-ul-Fitr">
+                </div>
+                <div class="modal-buttons">
+                    <button id="addHolidayBtn" class="btn-modal-primary">Add Holiday</button>
+                    <button id="closeHolidayBtn" class="btn-modal-secondary">Close</button>
+                </div>
+
+                <!-- Holiday List -->
+                <div class="holiday-list" id="holidayList">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script>
-        const SHEET_URL = 'https://script.google.com/macros/s/AKfycbyjgb7lTC1YaON02CXgddYYLXZyUgZcrsa7gPn3-SOqFQSIhXFoB5M3slgrATyVM67F/exec'; // Replace with your actual URL
+        const SHEET_URL = 'YOUR_GOOGLE_SHEETS_URL_HERE'; // Replace with your actual URL
+        const ADMIN_PASSWORD = 'ilovemyubl4321';
 
         let currentEmployeeData = [];
         let currentStats = {};
         let currentRawData = [];
         let currentDateRange = {};
+        let holidays = JSON.parse(localStorage.getItem('ubl_holidays') || '[]');
+        let isPasswordVerified = false;
+
+        // Holiday Management Functions
+        function saveHolidays() {
+            localStorage.setItem('ubl_holidays', JSON.stringify(holidays));
+        }
+
+        function loadHolidayList() {
+            const holidayList = document.getElementById('holidayList');
+            if (holidays.length === 0) {
+                holidayList.innerHTML = '<p style="text-align: center; color: #64748B; padding: 1rem;">No holidays added yet</p>';
+                return;
+            }
+
+            holidays.sort((a, b) => new Date(a.date) - new Date(b.date));
+            
+            holidayList.innerHTML = holidays.map((holiday, index) => `
+                <div class="holiday-item">
+                    <div>
+                        <div class="holiday-date">${formatDateTime(new Date(holiday.date))}</div>
+                        <div class="holiday-name">${holiday.name}</div>
+                    </div>
+                    <button class="btn-remove-holiday" onclick="removeHoliday(${index})">Remove</button>
+                </div>
+            `).join('');
+        }
+
+        function removeHoliday(index) {
+            if (confirm('Are you sure you want to remove this holiday?')) {
+                holidays.splice(index, 1);
+                saveHolidays();
+                loadHolidayList();
+            }
+        }
+
+        window.removeHoliday = removeHoliday;
+
+        // Modal Controls
+        document.getElementById('holidayBtn').addEventListener('click', function() {
+            document.getElementById('holidayModal').classList.add('show');
+            if (isPasswordVerified) {
+                document.getElementById('passwordSection').style.display = 'none';
+                document.getElementById('holidayManagementSection').style.display = 'block';
+                loadHolidayList();
+            } else {
+                document.getElementById('passwordSection').style.display = 'block';
+                document.getElementById('holidayManagementSection').style.display = 'none';
+            }
+        });
+
+        document.getElementById('verifyPasswordBtn').addEventListener('click', function() {
+            const password = document.getElementById('adminPassword').value;
+            if (password === ADMIN_PASSWORD) {
+                isPasswordVerified = true;
+                document.getElementById('passwordSection').style.display = 'none';
+                document.getElementById('holidayManagementSection').style.display = 'block';
+                document.getElementById('adminPassword').value = '';
+                loadHolidayList();
+            } else {
+                alert('Incorrect password!');
+            }
+        });
+
+        document.getElementById('closePasswordBtn').addEventListener('click', function() {
+            document.getElementById('holidayModal').classList.remove('show');
+            document.getElementById('adminPassword').value = '';
+        });
+
+        document.getElementById('closeHolidayBtn').addEventListener('click', function() {
+            document.getElementById('holidayModal').classList.remove('show');
+        });
+
+        document.getElementById('addHolidayBtn').addEventListener('click', function() {
+            const date = document.getElementById('holidayDate').value;
+            const name = document.getElementById('holidayName').value;
+
+            if (!date || !name) {
+                alert('Please fill in both date and name');
+                return;
+            }
+
+            holidays.push({ date, name });
+            saveHolidays();
+            loadHolidayList();
+            
+            document.getElementById('holidayDate').value = '';
+            document.getElementById('holidayName').value = '';
+            
+            alert('Holiday added successfully!');
+        });
+
+        // Check if date is a holiday
+        function isHoliday(date) {
+            const dateStr = date.toISOString().split('T')[0];
+            return holidays.some(h => h.date === dateStr);
+        }
 
         // Initialize date selectors
         function initializeDateSelectors() {
@@ -715,7 +1034,6 @@
                 const option = document.createElement('option');
                 option.value = JSON.stringify({ start: weekStart.toISOString(), end: weekEnd.toISOString() });
                 option.textContent = `${formatDate(weekStart)} - ${formatDate(weekEnd)}`;
-                if (i === 0) option.selected = true;
                 weekSelect.appendChild(option);
             }
 
@@ -729,7 +1047,6 @@
                     month: month.getMonth() 
                 });
                 option.textContent = month.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-                if (i === 0) option.selected = true;
                 monthSelect.appendChild(option);
             }
         }
@@ -749,9 +1066,19 @@
 
         // Toggle between weekly and monthly view
         document.getElementById('viewType').addEventListener('change', function() {
-            const isWeekly = this.value === 'weekly';
-            document.getElementById('weekSelector').style.display = isWeekly ? 'block' : 'none';
-            document.getElementById('monthSelector').style.display = isWeekly ? 'none' : 'block';
+            const viewType = this.value;
+            
+            if (viewType === 'weekly') {
+                document.getElementById('weekSelector').style.display = 'block';
+                document.getElementById('monthSelector').style.display = 'none';
+            } else if (viewType === 'monthly') {
+                document.getElementById('weekSelector').style.display = 'none';
+                document.getElementById('monthSelector').style.display = 'block';
+            } else {
+                // No selection made
+                document.getElementById('weekSelector').style.display = 'none';
+                document.getElementById('monthSelector').style.display = 'none';
+            }
         });
 
         // Check if date is weekend
@@ -760,13 +1087,14 @@
             return day === 0 || day === 6; // Sunday or Saturday
         }
 
-        // Get working days in range (excluding weekends)
+        // Get working days in range (excluding weekends and holidays)
         function getWorkingDays(startDate, endDate) {
             let count = 0;
             const current = new Date(startDate);
             
             while (current <= endDate) {
-                if (!isWeekend(current)) {
+                // Count only weekdays that are not holidays
+                if (!isWeekend(current) && !isHoliday(current)) {
                     count++;
                 }
                 current.setDate(current.getDate() + 1);
@@ -856,11 +1184,8 @@
                 // Filter by date range
                 if (date < startDate || date > endDate) return;
                 
-                // Filter by cluster
-                if (clusterFilter !== 'all' && cluster !== clusterFilter) return;
-                
-                // Skip weekends unless marked as present
-                if (isWeekend(date) && status !== 'Present') return;
+                // Filter by cluster (skip if not 'all' and doesn't match, but allow empty string to mean 'all')
+                if (clusterFilter && clusterFilter !== 'all' && cluster !== clusterFilter) return;
                 
                 // Initialize employee stats
                 if (!employeeStats[name]) {
@@ -875,14 +1200,15 @@
                     detailedRecords[name] = [];
                 }
                 
-                // Store detailed record
+                // Store detailed record for ALL attendance (including Saturdays)
                 detailedRecords[name].push({
                     date: date,
                     status: status,
                     time: time
                 });
                 
-                // Count attendance
+                // Count attendance for ALL days (including Saturdays when they come in)
+                // But this won't affect working days calculation
                 if (status === 'Present') {
                     employeeStats[name].ontime++;
                 } else if (status === 'Late') {
@@ -1106,15 +1432,36 @@
             const viewType = document.getElementById('viewType').value;
             const clusterFilter = document.getElementById('clusterFilter').value;
             
+            // Validation
+            if (!viewType) {
+                alert('Please select a view type (Weekly or Monthly)');
+                return;
+            }
+            
+            if (!clusterFilter) {
+                alert('Please select a cluster');
+                return;
+            }
+            
             let startDate, endDate, periodText;
             
             if (viewType === 'weekly') {
-                const weekData = JSON.parse(document.getElementById('weekSelect').value);
+                const weekValue = document.getElementById('weekSelect').value;
+                if (!weekValue) {
+                    alert('Please select a week');
+                    return;
+                }
+                const weekData = JSON.parse(weekValue);
                 startDate = new Date(weekData.start);
                 endDate = new Date(weekData.end);
                 periodText = `Week of ${formatDate(startDate)}`;
             } else {
-                const monthData = JSON.parse(document.getElementById('monthSelect').value);
+                const monthValue = document.getElementById('monthSelect').value;
+                if (!monthValue) {
+                    alert('Please select a month');
+                    return;
+                }
+                const monthData = JSON.parse(monthValue);
                 startDate = new Date(monthData.year, monthData.month, 1);
                 endDate = new Date(monthData.year, monthData.month + 1, 0);
                 periodText = startDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
@@ -1125,7 +1472,7 @@
             
             // Update table title
             document.getElementById('tableTitle').textContent = 
-                `Attendance Details - ${periodText}${clusterFilter !== 'all' ? ` (${clusterFilter})` : ''}`;
+                `Attendance Details - ${periodText}${clusterFilter !== 'all' && clusterFilter !== '' ? ` (${clusterFilter})` : ''}`;
             
             // Show loading
             document.getElementById('loadingState').style.display = 'block';
